@@ -19,7 +19,7 @@ public:
     giro45Izq = 0;
     girarIzq = 0;
   }
-  ComportamientoAuxiliar(std::vector<std::vector<unsigned char>> mapaR, std::vector<std::vector<int>> mapaC) : Comportamiento(mapaR,mapaC)
+  ComportamientoAuxiliar(std::vector<std::vector<unsigned char>> mapaR, std::vector<std::vector<unsigned char>> mapaC) : Comportamiento(mapaR,mapaC)
   {
     // Inicializar Variables de Estado Niveles 2,3
   }

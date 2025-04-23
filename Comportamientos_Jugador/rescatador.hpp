@@ -18,7 +18,7 @@ public:
     tiene_zapatillas = false;
     giro45Izq = 0;
   }
-  ComportamientoRescatador(std::vector<std::vector<unsigned char>> mapaR, std::vector<std::vector<int>> mapaC) : Comportamiento(mapaR,mapaC)
+  ComportamientoRescatador(std::vector<std::vector<unsigned char>> mapaR, std::vector<std::vector<unsigned char>> mapaC) : Comportamiento(mapaR,mapaC)
   {
     // Inicializar Variables de Estado Niveles 2,3
   }

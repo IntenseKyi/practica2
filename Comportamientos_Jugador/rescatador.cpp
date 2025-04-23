@@ -57,7 +57,7 @@ char ViablePorAlturaR (char casilla, int dif, bool zap)
 		return 'P';
 }
 
-void SituarSensorEnMapaR(vector<vector<unsigned char>> &m, vector<vector<int>> &a, Sensores sensores)
+void SituarSensorEnMapaR(vector<vector<unsigned char>> &m, vector<vector<unsigned char>> &a, Sensores sensores)
 {
 	m[sensores.posF][sensores.posC] = sensores.superficie[0];
 	
