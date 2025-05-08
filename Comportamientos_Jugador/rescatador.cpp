@@ -11,7 +11,7 @@ Action ComportamientoRescatador::think(Sensores sensores)
 		accion = ComportamientoRescatadorNivel_0 (sensores);
 		break;
 	case 1:
-		// accion = ComportamientoRescatadorNivel_1 (sensores);
+		accion = ComportamientoRescatadorNivel_1 (sensores);
 		break;
 	case 2:
 		// accion = ComportamientoRescatadorNivel_2 (sensores);
@@ -60,6 +60,7 @@ char ViablePorAlturaR (char casilla, int dif, bool zap)
 void SituarSensorEnMapaR(vector<vector<unsigned char>> &m, vector<vector<unsigned char>> &a, Sensores sensores)
 {
 	m[sensores.posF][sensores.posC] = sensores.superficie[0];
+	a[sensores.posF][sensores.posC] = sensores.cota[0];
 	
 	int pos = 1;
 	switch(sensores.rumbo)
@@ -81,6 +82,22 @@ void SituarSensorEnMapaR(vector<vector<unsigned char>> &m, vector<vector<unsigne
 		m[sensores.posF-3][sensores.posC+2] = sensores.superficie[14];
 		m[sensores.posF-3][sensores.posC+3] = sensores.superficie[15];
 		
+		a[sensores.posF-1][sensores.posC-1] = sensores.cota[1];
+		a[sensores.posF-1][sensores.posC] = sensores.cota[2];
+		a[sensores.posF-1][sensores.posC+1] = sensores.cota[3];
+		a[sensores.posF-2][sensores.posC-2] = sensores.cota[4];
+		a[sensores.posF-2][sensores.posC-1] = sensores.cota[5];
+		a[sensores.posF-2][sensores.posC] = sensores.cota[6];
+		a[sensores.posF-2][sensores.posC+1] = sensores.cota[7];
+		a[sensores.posF-2][sensores.posC+2] = sensores.cota[8];
+		a[sensores.posF-3][sensores.posC-3] = sensores.cota[9];
+		a[sensores.posF-3][sensores.posC-2] = sensores.cota[10];
+		a[sensores.posF-3][sensores.posC-1] = sensores.cota[11];
+		a[sensores.posF-3][sensores.posC] = sensores.cota[12];
+		a[sensores.posF-3][sensores.posC+1] = sensores.cota[13];
+		a[sensores.posF-3][sensores.posC+2] = sensores.cota[14];
+		a[sensores.posF-3][sensores.posC+3] = sensores.cota[15];
+		
 		break;
 	case noreste:
 		m[sensores.posF-1][sensores.posC] = sensores.superficie[1];
@@ -99,6 +116,22 @@ void SituarSensorEnMapaR(vector<vector<unsigned char>> &m, vector<vector<unsigne
 		m[sensores.posF-1][sensores.posC+3] = sensores.superficie[14];
 		m[sensores.posF][sensores.posC+3] = sensores.superficie[15];
 		
+		a[sensores.posF-1][sensores.posC] = sensores.cota[1];
+		a[sensores.posF-1][sensores.posC+1] = sensores.cota[2];
+		a[sensores.posF][sensores.posC+1] = sensores.cota[3];
+		a[sensores.posF-2][sensores.posC] = sensores.cota[4];
+		a[sensores.posF-2][sensores.posC+1] = sensores.cota[5];
+		a[sensores.posF-2][sensores.posC+2] = sensores.cota[6];
+		a[sensores.posF-1][sensores.posC+2] = sensores.cota[7];
+		a[sensores.posF][sensores.posC+2] = sensores.cota[8];
+		a[sensores.posF-3][sensores.posC] = sensores.cota[9];
+		a[sensores.posF-3][sensores.posC+1] = sensores.cota[10];
+		a[sensores.posF-3][sensores.posC+2] = sensores.cota[11];
+		a[sensores.posF-3][sensores.posC+3] = sensores.cota[12];
+		a[sensores.posF-2][sensores.posC+3] = sensores.cota[13];
+		a[sensores.posF-1][sensores.posC+3] = sensores.cota[14];
+		a[sensores.posF][sensores.posC+3] = sensores.cota[15];
+	
 		break;
 	case este:
 		m[sensores.posF-1][sensores.posC+1] = sensores.superficie[1];
@@ -116,6 +149,23 @@ void SituarSensorEnMapaR(vector<vector<unsigned char>> &m, vector<vector<unsigne
 		m[sensores.posF+1][sensores.posC+3] = sensores.superficie[13];
 		m[sensores.posF+2][sensores.posC+3] = sensores.superficie[14];
 		m[sensores.posF+3][sensores.posC+3] = sensores.superficie[15];
+		
+		a[sensores.posF-1][sensores.posC+1] = sensores.cota[1];
+		a[sensores.posF][sensores.posC+1] = sensores.cota[2];
+		a[sensores.posF+1][sensores.posC+1] = sensores.cota[3];
+		a[sensores.posF-2][sensores.posC+2] = sensores.cota[4];
+		a[sensores.posF-1][sensores.posC+2] = sensores.cota[5];
+		a[sensores.posF][sensores.posC+2] = sensores.cota[6];
+		a[sensores.posF+1][sensores.posC+2] = sensores.cota[7];
+		a[sensores.posF+2][sensores.posC+2] = sensores.cota[8];
+		a[sensores.posF-3][sensores.posC+3] = sensores.cota[9];
+		a[sensores.posF-2][sensores.posC+3] = sensores.cota[10];
+		a[sensores.posF-1][sensores.posC+3] = sensores.cota[11];
+		a[sensores.posF][sensores.posC+3] = sensores.cota[12];
+		a[sensores.posF+1][sensores.posC+3] = sensores.cota[13];
+		a[sensores.posF+2][sensores.posC+3] = sensores.cota[14];
+		a[sensores.posF+3][sensores.posC+3] = sensores.cota[15];
+		
 		break;
 	case sureste:
 		m[sensores.posF][sensores.posC+1] = sensores.superficie[1];
@@ -133,6 +183,23 @@ void SituarSensorEnMapaR(vector<vector<unsigned char>> &m, vector<vector<unsigne
 		m[sensores.posF+3][sensores.posC+2] = sensores.superficie[13];
 		m[sensores.posF+3][sensores.posC+1] = sensores.superficie[14];
 		m[sensores.posF+3][sensores.posC] = sensores.superficie[15];
+		
+		a[sensores.posF][sensores.posC+1] = sensores.cota[1];
+		a[sensores.posF+1][sensores.posC+1] = sensores.cota[2];
+		a[sensores.posF+1][sensores.posC] = sensores.cota[3];
+		a[sensores.posF][sensores.posC+2] = sensores.cota[4];
+		a[sensores.posF+1][sensores.posC+2] = sensores.cota[5];
+		a[sensores.posF+2][sensores.posC+2] = sensores.cota[6];
+		a[sensores.posF+2][sensores.posC+1] = sensores.cota[7];
+		a[sensores.posF+2][sensores.posC] = sensores.cota[8];
+		a[sensores.posF][sensores.posC+3] = sensores.cota[9];
+		a[sensores.posF+1][sensores.posC+3] = sensores.cota[10];
+		a[sensores.posF+2][sensores.posC+3] = sensores.cota[11];
+		a[sensores.posF+3][sensores.posC+3] = sensores.cota[12];
+		a[sensores.posF+3][sensores.posC+2] = sensores.cota[13];
+		a[sensores.posF+3][sensores.posC+1] = sensores.cota[14];
+		a[sensores.posF+3][sensores.posC] = sensores.cota[15];
+	
 		break;
 	case sur:
 		m[sensores.posF+1][sensores.posC+1] = sensores.superficie[1];
@@ -150,6 +217,23 @@ void SituarSensorEnMapaR(vector<vector<unsigned char>> &m, vector<vector<unsigne
 		m[sensores.posF+3][sensores.posC-1] = sensores.superficie[13];
 		m[sensores.posF+3][sensores.posC-2] = sensores.superficie[14];
 		m[sensores.posF+3][sensores.posC-3] = sensores.superficie[15];
+		
+		a[sensores.posF+1][sensores.posC+1] = sensores.cota[1];
+		a[sensores.posF+1][sensores.posC] = sensores.cota[2];
+		a[sensores.posF+1][sensores.posC-1] = sensores.cota[3];
+		a[sensores.posF+2][sensores.posC+2] = sensores.cota[4];
+		a[sensores.posF+2][sensores.posC+1] = sensores.cota[5];
+		a[sensores.posF+2][sensores.posC] = sensores.cota[6];
+		a[sensores.posF+2][sensores.posC-1] = sensores.cota[7];
+		a[sensores.posF+2][sensores.posC-2] = sensores.cota[8];
+		a[sensores.posF+3][sensores.posC+3] = sensores.cota[9];
+		a[sensores.posF+3][sensores.posC+2] = sensores.cota[10];
+		a[sensores.posF+3][sensores.posC+1] = sensores.cota[11];
+		a[sensores.posF+3][sensores.posC] = sensores.cota[12];
+		a[sensores.posF+3][sensores.posC-1] = sensores.cota[13];
+		a[sensores.posF+3][sensores.posC-2] = sensores.cota[14];
+		a[sensores.posF+3][sensores.posC-3] = sensores.cota[15];
+		
 		break;
 	case suroeste:
 		m[sensores.posF+1][sensores.posC] = sensores.superficie[1];
@@ -167,6 +251,23 @@ void SituarSensorEnMapaR(vector<vector<unsigned char>> &m, vector<vector<unsigne
 		m[sensores.posF+2][sensores.posC-3] = sensores.superficie[13];
 		m[sensores.posF+1][sensores.posC-3] = sensores.superficie[14];
 		m[sensores.posF][sensores.posC-3] = sensores.superficie[15];
+		
+		a[sensores.posF+1][sensores.posC] = sensores.cota[1];
+		a[sensores.posF+1][sensores.posC-1] = sensores.cota[2];
+		a[sensores.posF][sensores.posC-1] = sensores.cota[3];
+		a[sensores.posF+2][sensores.posC] = sensores.cota[4];
+		a[sensores.posF+2][sensores.posC-1] = sensores.cota[5];
+		a[sensores.posF+2][sensores.posC-2] = sensores.cota[6];
+		a[sensores.posF+1][sensores.posC-2] = sensores.cota[7];
+		a[sensores.posF][sensores.posC-2] = sensores.cota[8];
+		a[sensores.posF+3][sensores.posC] = sensores.cota[9];
+		a[sensores.posF+3][sensores.posC-1] = sensores.cota[10];
+		a[sensores.posF+3][sensores.posC-2] = sensores.cota[11];
+		a[sensores.posF+3][sensores.posC-3] = sensores.cota[12];
+		a[sensores.posF+2][sensores.posC-3] = sensores.cota[13];
+		a[sensores.posF+1][sensores.posC-3] = sensores.cota[14];
+		a[sensores.posF][sensores.posC-3] = sensores.cota[15];
+		
 		break;
 	case oeste:
 		m[sensores.posF+1][sensores.posC-1] = sensores.superficie[1];
@@ -184,6 +285,23 @@ void SituarSensorEnMapaR(vector<vector<unsigned char>> &m, vector<vector<unsigne
 		m[sensores.posF-1][sensores.posC-3] = sensores.superficie[13];
 		m[sensores.posF-2][sensores.posC-3] = sensores.superficie[14];
 		m[sensores.posF-3][sensores.posC-3] = sensores.superficie[15];
+		
+		a[sensores.posF+1][sensores.posC-1] = sensores.cota[1];
+		a[sensores.posF][sensores.posC-1] = sensores.cota[2];
+		a[sensores.posF-1][sensores.posC-1] = sensores.cota[3];
+		a[sensores.posF+2][sensores.posC-2] = sensores.cota[4];
+		a[sensores.posF+1][sensores.posC-2] = sensores.cota[5];
+		a[sensores.posF][sensores.posC-2] = sensores.cota[6];
+		a[sensores.posF-1][sensores.posC-2] = sensores.cota[7];
+		a[sensores.posF-2][sensores.posC-2] = sensores.cota[8];
+		a[sensores.posF+3][sensores.posC-3] = sensores.cota[9];
+		a[sensores.posF+2][sensores.posC-3] = sensores.cota[10];
+		a[sensores.posF+1][sensores.posC-3] = sensores.cota[11];
+		a[sensores.posF][sensores.posC-3] = sensores.cota[12];
+		a[sensores.posF-1][sensores.posC-3] = sensores.cota[13];
+		a[sensores.posF-2][sensores.posC-3] = sensores.cota[14];
+		a[sensores.posF-3][sensores.posC-3] = sensores.cota[15];
+		
 		break;
 	case noroeste:
 		m[sensores.posF][sensores.posC-1] = sensores.superficie[1];
@@ -201,9 +319,96 @@ void SituarSensorEnMapaR(vector<vector<unsigned char>> &m, vector<vector<unsigne
 		m[sensores.posF-3][sensores.posC-2] = sensores.superficie[13];
 		m[sensores.posF-3][sensores.posC-1] = sensores.superficie[14];
 		m[sensores.posF-3][sensores.posC] = sensores.superficie[15];
+		
+		a[sensores.posF][sensores.posC-1] = sensores.cota[1];
+		a[sensores.posF-1][sensores.posC-1] = sensores.cota[2];
+		a[sensores.posF-1][sensores.posC] = sensores.cota[3];
+		a[sensores.posF][sensores.posC-2] = sensores.cota[4];
+		a[sensores.posF-1][sensores.posC-2] = sensores.cota[5];
+		a[sensores.posF-2][sensores.posC-2] = sensores.cota[6];
+		a[sensores.posF-2][sensores.posC-1] = sensores.cota[7];
+		a[sensores.posF-2][sensores.posC] = sensores.cota[8];
+		a[sensores.posF][sensores.posC-3] = sensores.cota[9];
+		a[sensores.posF-1][sensores.posC-3] = sensores.cota[10];
+		a[sensores.posF-2][sensores.posC-3] = sensores.cota[11];
+		a[sensores.posF-3][sensores.posC-3] = sensores.cota[12];
+		a[sensores.posF-3][sensores.posC-2] = sensores.cota[13];
+		a[sensores.posF-3][sensores.posC-1] = sensores.cota[14];
+		a[sensores.posF-3][sensores.posC] = sensores.cota[15];
+		
 		break;
+		
+	default:
+		break;
+
 	}
 } 
+
+void DireccionesDesdeRumbo(const Orientacion &rumbo, int df[3], int dc[3]) {
+    if (rumbo == norte) {
+        df[0] = 0; dc[0] = -1; // izq
+        df[1] = -1; dc[1] = 0; // frente
+        df[2] = 0; dc[2] = 1;  // der
+    } else if (rumbo == noreste) {
+        df[0] = -1; dc[0] = -1;
+        df[1] = -1; dc[1] = 1;
+        df[2] = 1; dc[2] = 1;
+    } else if (rumbo == este) {
+        df[0] = -1; dc[0] = 0;
+        df[1] = 0; dc[1] = 1;
+        df[2] = 1; dc[2] = 0;
+    } else if (rumbo == sureste) {
+        df[0] = -1; dc[0] = 1;
+        df[1] = 1; dc[1] = 1;
+        df[2] = 1; dc[2] = -1;
+    } else if (rumbo == sur) { 
+        df[0] = 0; dc[0] = 1;
+        df[1] = 1; dc[1] = 0;
+        df[2] = 0; dc[2] = -1;
+    } else if (rumbo == suroeste) {
+        df[0] = 1; dc[0] = 1;
+        df[1] = 1; dc[1] = -1;
+        df[2] = -1; dc[2] = -1;
+    } else if (rumbo == oeste) {
+        df[0] = 1; dc[0] = 0;
+        df[1] = 0; dc[1] = -1;
+        df[2] = -1; dc[2] = 0;
+    } else if (rumbo == noroeste) {
+        df[0] = 1; dc[0] = -1;
+        df[1] = -1; dc[1] = -1;
+        df[2] = -1; dc[2] = 1;
+    }
+}
+
+
+int CasillaMasDesconocida(char i, char c, char d,
+                                                    int fila, int col,
+                                                    const Orientacion &rumbo,
+                                                    const vector<vector<unsigned char>> &mapaResultado) {
+    int desconocidos[3] = {0, 0, 0};
+    int df[3], dc[3];
+    DireccionesDesdeRumbo(rumbo, df, dc);
+
+    for (int k = 0; k < 3; ++k) {
+        int nf = fila + df[k];
+        int nc = col + dc[k];
+        if (nf >= 0 && nf < mapaResultado.size() &&
+            nc >= 0 && nc < mapaResultado[0].size()) {
+            if (mapaResultado[nf][nc] == '?') {
+                desconocidos[k] = 1;
+            }
+        }
+    }
+
+    if (desconocidos[1]) return 2; // Frente
+    if (desconocidos[0]) return 1; // Izquierda
+    if (desconocidos[2]) return 3; // Derecha
+    return 0;
+}
+
+
+
+//=============================================================================================//
 
 Action ComportamientoRescatador::ComportamientoRescatadorNivel_0(Sensores sensores)
 {
@@ -256,7 +461,45 @@ Action ComportamientoRescatador::ComportamientoRescatadorNivel_0(Sensores sensor
 
 Action ComportamientoRescatador::ComportamientoRescatadorNivel_1(Sensores sensores)
 {
+    Action accion = IDLE;
+
+    // Actualizo variables de estado
+    SituarSensorEnMapaR(mapaResultado, mapaCotas, sensores);
+    if (sensores.superficie[0] == 'D') tiene_zapatillas = true;
+
+    // Exploración reactiva: decidir por qué dirección avanzar
+    char i = ViablePorAlturaR(sensores.superficie[1], sensores.cota[1]-sensores.cota[0], tiene_zapatillas);
+    char c = ViablePorAlturaR(sensores.superficie[2], sensores.cota[2]-sensores.cota[0], tiene_zapatillas);
+    char d = ViablePorAlturaR(sensores.superficie[3], sensores.cota[3]-sensores.cota[0], tiene_zapatillas);
+
+    // Prioriza caminar hacia casillas de tipo camino/sendero desconocidas
+    int pos = CasillaMasDesconocida(i, c, d, sensores.posF, sensores.posC, sensores.rumbo, mapaResultado);
+
+    switch (pos) {
+    case 2:
+        accion = WALK;
+        break;
+    case 1:
+        giro45Izq = 1;
+        accion = TURN_L;
+        break;
+    case 3:
+        accion = TURN_SR;
+        break;
+    case 0:
+        // Si no hay casillas desconocidas alrededor, pero puede avanzar, que avance
+        if (c == '1') {
+            accion = WALK;
+        } else {
+            accion = TURN_L;
+        }
+        break;
 }
+
+    last_action = accion;
+    return accion;
+}
+
 
 Action ComportamientoRescatador::ComportamientoRescatadorNivel_2(Sensores sensores)
 {
