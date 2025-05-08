@@ -32,7 +32,7 @@ int ComportamientoRescatador::interact(Action accion, int valor)
 	return 0;
 }
 
-int VeoCasillaInteresanteR (char i, char c, char d, bool zap)
+int VeoCasillaInteresanteR_N0 (char i, char c, char d, bool zap)
 {
 	if (c == 'X') return 2;
 	else if (i == 'X') return 1;
@@ -49,7 +49,21 @@ int VeoCasillaInteresanteR (char i, char c, char d, bool zap)
 	else return 0;
 }
 
-char ViablePorAlturaR (char casilla, int dif, bool zap)
+int VeoCasillaInteresanteR_N1 (char i, char c, char d, bool zap)
+{
+	if (!zap)
+	{
+		if (c == 'D') return 2;
+		else if (i == 'D') return 1;
+		else if (d == 'D') return 3;
+	}
+	if (c != 'M' && c != 'P' && c != 'B') return 2;
+	else if (i != 'M' && i != 'P' && i != 'B') return 1;
+	else if (d != 'M' && d != 'P' && d != 'B') return 3;
+	else return 0;
+}
+
+char CasillaViableR (char casilla, int dif, bool zap)
 {
 	if (abs(dif)<=1 or (zap and abs(dif)<=2))
 		return casilla;
@@ -344,7 +358,7 @@ void SituarSensorEnMapaR(vector<vector<unsigned char>> &m, vector<vector<unsigne
 	}
 } 
 
-void DireccionesDesdeRumbo(const Orientacion &rumbo, int df[3], int dc[3]) {
+void DireccionesDesdeRumboR(const Orientacion &rumbo, int df[3], int dc[3]) {
     if (rumbo == norte) {
         df[0] = 0; dc[0] = -1; // izq
         df[1] = -1; dc[1] = 0; // frente
@@ -381,13 +395,13 @@ void DireccionesDesdeRumbo(const Orientacion &rumbo, int df[3], int dc[3]) {
 }
 
 
-int CasillaMasDesconocida(char i, char c, char d,
+int CasillaMasDesconocidaR(char i, char c, char d,
                                                     int fila, int col,
                                                     const Orientacion &rumbo,
                                                     const vector<vector<unsigned char>> &mapaResultado) {
     int desconocidos[3] = {0, 0, 0};
     int df[3], dc[3];
-    DireccionesDesdeRumbo(rumbo, df, dc);
+    DireccionesDesdeRumboR(rumbo, df, dc);
 
     for (int k = 0; k < 3; ++k) {
         int nf = fila + df[k];
@@ -432,11 +446,11 @@ Action ComportamientoRescatador::ComportamientoRescatadorNivel_0(Sensores sensor
 		giro45Izq--;
 	} else
 	{
-		char i = ViablePorAlturaR(sensores.superficie[1], sensores.cota[1]-sensores.cota[0], tiene_zapatillas);
-		char c = ViablePorAlturaR(sensores.superficie[2], sensores.cota[2]-sensores.cota[0], tiene_zapatillas);
-		char d = ViablePorAlturaR(sensores.superficie[3], sensores.cota[3]-sensores.cota[0], tiene_zapatillas);
+		char i = CasillaViableR(sensores.superficie[1], sensores.cota[1]-sensores.cota[0], tiene_zapatillas);
+		char c = CasillaViableR(sensores.superficie[2], sensores.cota[2]-sensores.cota[0], tiene_zapatillas);
+		char d = CasillaViableR(sensores.superficie[3], sensores.cota[3]-sensores.cota[0], tiene_zapatillas);
 	
-		int pos = VeoCasillaInteresanteR(i, c, d, tiene_zapatillas);
+		int pos = VeoCasillaInteresanteR_N0(i, c, d, tiene_zapatillas);
 		switch(pos)
 		{
 		case 2:
@@ -466,35 +480,65 @@ Action ComportamientoRescatador::ComportamientoRescatadorNivel_1(Sensores sensor
     // Actualizo variables de estado
     SituarSensorEnMapaR(mapaResultado, mapaCotas, sensores);
     if (sensores.superficie[0] == 'D') tiene_zapatillas = true;
+	
+	//Definicion comportamiento
+	if (sensores.agentes[2] == 'a') {
+		// Si hay un auxiliar delante, evitamos la colisión
+		accion = TURN_L;
+	} else if (giro45Izq != 0)	//Estoy haciendo TURN_SL
+	{
+		accion = TURN_SR;
+		giro45Izq--;
+	} else
+	{
+		// Exploración reactiva: decidir por qué dirección avanzar
+		char i = CasillaViableR(sensores.superficie[1], sensores.cota[1]-sensores.cota[0], tiene_zapatillas);
+		char c = CasillaViableR(sensores.superficie[2], sensores.cota[2]-sensores.cota[0], tiene_zapatillas);
+		char d = CasillaViableR(sensores.superficie[3], sensores.cota[3]-sensores.cota[0], tiene_zapatillas);
 
-    // Exploración reactiva: decidir por qué dirección avanzar
-    char i = ViablePorAlturaR(sensores.superficie[1], sensores.cota[1]-sensores.cota[0], tiene_zapatillas);
-    char c = ViablePorAlturaR(sensores.superficie[2], sensores.cota[2]-sensores.cota[0], tiene_zapatillas);
-    char d = ViablePorAlturaR(sensores.superficie[3], sensores.cota[3]-sensores.cota[0], tiene_zapatillas);
+		// Prioriza caminar hacia casillas de tipo camino/sendero desconocidas
+		int pos = CasillaMasDesconocidaR(i, c, d, sensores.posF, sensores.posC, sensores.rumbo, mapaResultado);
 
-    // Prioriza caminar hacia casillas de tipo camino/sendero desconocidas
-    int pos = CasillaMasDesconocida(i, c, d, sensores.posF, sensores.posC, sensores.rumbo, mapaResultado);
-
-    switch (pos) {
-    case 2:
-        accion = WALK;
-        break;
-    case 1:
-        giro45Izq = 1;
-        accion = TURN_L;
-        break;
-    case 3:
-        accion = TURN_SR;
-        break;
-    case 0:
-        // Si no hay casillas desconocidas alrededor, pero puede avanzar, que avance
-        if (c == '1') {
-            accion = WALK;
-        } else {
-            accion = TURN_L;
-        }
-        break;
-}
+		switch (pos) 
+		{
+		case 2:
+			accion = WALK;
+		    
+		    break;
+		case 1:
+			giro45Izq = 1;
+		    accion = TURN_L;
+		    
+		    break;
+		case 3:
+			accion = TURN_SR;
+		    
+		    break;
+		case 0:
+		    int pos2 = VeoCasillaInteresanteR_N1(i, c, d, tiene_zapatillas);
+		    
+			switch(pos2)
+			{
+			case 2:
+				accion = WALK;
+				
+				break;
+			case 1:
+				giro45Izq = 1;
+				accion = TURN_L;
+				
+				break;
+			case 3:
+				accion = TURN_SR;
+				
+				break;
+			case 0:
+				accion = TURN_L;
+				break;
+			}
+		    break;
+		}
+	}
 
     last_action = accion;
     return accion;
