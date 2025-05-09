@@ -18,7 +18,11 @@ public:
     tiene_zapatillas = false;
     giro45Izq = 0;
     
-    mapa_visitas = vector<vector<int>>(100, vector<int>(100, 0));
+    for (int i = 0; i < 100; i++)
+      for (int j = 0; j < 100; j++)
+        mapa_visitas[i][j] = 0;
+
+    
   }
   ComportamientoRescatador(std::vector<std::vector<unsigned char>> mapaR, std::vector<std::vector<unsigned char>> mapaC) : Comportamiento(mapaR,mapaC)
   {
@@ -42,7 +46,7 @@ private:
   Action last_action;
   bool tiene_zapatillas;
   int giro45Izq;
-  vector<vector<int>> mapa_visitas;
+  int mapa_visitas[100][100];
 };
 
 #endif

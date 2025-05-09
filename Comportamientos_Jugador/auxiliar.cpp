@@ -33,6 +33,21 @@ int ComportamientoAuxiliar::interact(Action accion, int valor)
 	return 0;
 }
 
+int costeTerreno_A(char terreno)
+{
+    switch (terreno) {
+    case 'T': return 1;  // Tierra/camino
+    case 'S': return 1;  // Sendero
+    case 'C': return 1;  // Ciudad
+    case 'D': return 1;  // Zapatillas
+    case 'A': return 5;  // Agua
+    case 'B': return 5;  // Bosque
+    case 'M': return 1000; // Montaña (intransitable)
+    case 'P': return 1000; // Precipicio
+    default:  return 100;  // Desconocido o peligroso
+    }
+}
+
 int VeoCasillaInteresanteA_N0 (char i, char c, char d)
 {
 	if (c == 'X') return 2;
@@ -44,9 +59,9 @@ int VeoCasillaInteresanteA_N0 (char i, char c, char d)
 	else return 0;
 }
 
-int VeoCasillaInteresanteA_N1 (char i, char c, char d, bool zap)
+int VeoCasillaInteresanteA_N1 (char i, char c, char d, bool zap, int df[5], int dc[5], int vi, int vc, int vd)
 {
-	if (!zap)
+	/*if (!zap)
 	{
 		if (c == 'D') return 2;
 		else if (i == 'D') return 1;
@@ -64,7 +79,33 @@ int VeoCasillaInteresanteA_N1 (char i, char c, char d, bool zap)
 	{
 		if (!(!zap && c == 'B')) return 3;
 	}
-	else return 0;
+	else return 0;*/
+
+	struct Opcion {
+        int direccion; // 1 izq, 2 centro, 3 der
+        int visitas;
+        int coste;
+    };
+
+    std::vector<Opcion> opciones;
+
+    if (c != 'M' && c != 'P') opciones.push_back({2, vc, costeTerreno_A(c)});
+    if (i != 'M' && i != 'P') opciones.push_back({1, vi, costeTerreno_A(i)});
+    if (d != 'M' && d != 'P') opciones.push_back({3, vd, costeTerreno_A(d)});
+
+    // Penaliza coste y visitas: peso relativo (visitas + coste*2)
+    int mejor = 0;
+    int min_punt = 1e9;
+
+    for (auto op : opciones) {
+        int puntuacion = op.visitas + op.coste * 2;
+        if (puntuacion < min_punt) {
+            mejor = op.direccion;
+            min_punt = puntuacion;
+        }
+    }
+
+    return mejor; // 1, 2, 3 o 0 si nada
 }
 
 char CasillaViableA (char casilla, int dif)
@@ -360,67 +401,100 @@ void SituarSensorEnMapaA(vector<vector<unsigned char>> &m, vector<vector<unsigne
 		break;
 
 	}
-} 
+}
 
-void DireccionesDesdeRumboA(const Orientacion &rumbo, int df[3], int dc[3]) {
-    if (rumbo == norte) {
-        df[0] = 0; dc[0] = -1; // izq
-        df[1] = -1; dc[1] = 0; // frente
-        df[2] = 0; dc[2] = 1;  // der
-    } else if (rumbo == noreste) {
+void DireccionesDesdeRumboA(const Orientacion &rumbo, int df[5], int dc[5]) {
+    switch (rumbo) {
+    case norte:
+        df[0] = 0;  dc[0] = -1; // izq
+        df[1] = -1; dc[1] = -1;  // izq+frente
+        df[2] = -1;  dc[2] = 0;  // frente
+        df[3] = -1; dc[3] = 1;  // der+frente
+        df[4] = 0;  dc[4] = 1;  // der
+        break;
+    case noreste:
         df[0] = -1; dc[0] = -1;
-        df[1] = -1; dc[1] = 1;
-        df[2] = 1; dc[2] = 1;
-    } else if (rumbo == este) {
+        df[1] = -1; dc[1] = 0;
+        df[2] = -1;  dc[2] = 1;
+        df[3] = 0; dc[3] = 1;  
+        df[4] = 1;  dc[4] = 1;  
+        break;
+    case este:
         df[0] = -1; dc[0] = 0;
-        df[1] = 0; dc[1] = 1;
-        df[2] = 1; dc[2] = 0;
-    } else if (rumbo == sureste) {
+        df[1] = -1;  dc[1] = 1;
+        df[2] = 0;  dc[2] = 1;
+        df[3] = 1; dc[3] = 1;  
+        df[4] = 1;  dc[4] = 0;  
+        break;
+    case sureste:
         df[0] = -1; dc[0] = 1;
-        df[1] = 1; dc[1] = 1;
+        df[1] = 0;  dc[1] = 1;
+        df[2] = 1;  dc[2] = 1;
+        df[3] = 1; dc[3] = 0;  
+        df[4] = 1;  dc[4] = -1;  
+        break;
+    case sur:
+        df[0] = 0;  dc[0] = 1;
+        df[1] = 1;  dc[1] = 1;
+        df[2] = 1;  dc[2] = 0;
+        df[3] = 1; dc[3] = -1;  
+        df[4] = 0;  dc[4] = -1;  
+        break;
+    case suroeste:
+        df[0] = 1;  dc[0] = 1;
+        df[1] = 1;  dc[1] = 0;
         df[2] = 1; dc[2] = -1;
-    } else if (rumbo == sur) { 
-        df[0] = 0; dc[0] = 1;
-        df[1] = 1; dc[1] = 0;
-        df[2] = 0; dc[2] = -1;
-    } else if (rumbo == suroeste) {
-        df[0] = 1; dc[0] = 1;
-        df[1] = 1; dc[1] = -1;
-        df[2] = -1; dc[2] = -1;
-    } else if (rumbo == oeste) {
-        df[0] = 1; dc[0] = 0;
+        df[3] = 0; dc[3] = -1;  
+        df[4] = -1;  dc[4] = -1;  
+        break;
+    case oeste:
+        df[0] = 1;  dc[0] = 0;
+        df[1] = 1;  dc[1] = -1;
+        df[2] = 0; dc[2] = -1	;
+        df[3] = -1; dc[3] = -1;  
+        df[4] = -1; dc[4] = 0;  
+        break;
+    case noroeste:
+        df[0] = 1;  dc[0] = -1;
         df[1] = 0; dc[1] = -1;
-        df[2] = -1; dc[2] = 0;
-    } else if (rumbo == noroeste) {
-        df[0] = 1; dc[0] = -1;
-        df[1] = -1; dc[1] = -1;
-        df[2] = -1; dc[2] = 1;
-    }
+        df[2] = -1; dc[2] = -1;
+        df[3] = -1; dc[3] = 0;  
+        df[4] = -1;  dc[4] = 1;  
+        break;
+}
+
 }
 
 int CasillaMasDesconocidaA(char i, char c, char d,
-                                                    int fila, int col,
-                                                    const Orientacion &rumbo,
-                                                    const vector<vector<unsigned char>> &mapaResultado) {
-    int desconocidos[3] = {0, 0, 0};
-    int df[3], dc[3];
-    DireccionesDesdeRumboA(rumbo, df, dc);
+							int fila, int col,
+							const Orientacion &rumbo,
+							const vector<vector<unsigned char>> &mapaResultado,
+							int vi, int vc, int vd) {
+	int desconocidos[3] = {0, 0, 0};
+	int df[5], dc[5];
 
-    for (int k = 0; k < 3; ++k) {
-        int nf = fila + df[k];
-        int nc = col + dc[k];
-        if (nf >= 0 && nf < mapaResultado.size() &&
-            nc >= 0 && nc < mapaResultado[0].size()) {
-            if (mapaResultado[nf][nc] == '?') {
-                desconocidos[k] = 1;
-            }
-        }
-    }
+	//std::cout << "Desconozco-Visitas i: " << vi << " c: " << vc << " d: " << vd << "\n";
 
-    if (desconocidos[1]) return 2; // Frente
-    if (desconocidos[0]) return 1; // Izquierda
-    if (desconocidos[2]) return 3; // Derecha
-    return 0;
+	DireccionesDesdeRumboA(rumbo, df, dc);
+	int menor_visita = min(vi, (vc, vd));
+
+	int i_desconocidos = 0;
+	for (int k = 0; k < 5; k+=2) {
+		int nf = fila + df[k];
+		int nc = col + dc[k];
+		if (nf >= 0 && nf < mapaResultado.size() &&
+		nc >= 0 && nc < mapaResultado[0].size()) {
+			if (mapaResultado[nf][nc] == '?') {
+				desconocidos[i_desconocidos] = 1;
+			}
+		}
+		i_desconocidos++;
+	}
+
+	if (desconocidos[1] && vc == menor_visita) return 2; // Frente
+	if (desconocidos[0] && vi == menor_visita) return 1; // Izquierda
+	if (desconocidos[2] && vd == menor_visita) return 3; // Derecha
+	return 0;
 }
 
 
@@ -490,6 +564,7 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_1(Sensores sensores)
     Action accion = IDLE;
 
 	//Actualizo variables de estado
+	mapa_visitas[sensores.posF][sensores.posC]++;
 	SituarSensorEnMapaA(mapaResultado, mapaCotas, sensores);
     if (sensores.superficie[0] == 'D') tiene_zapatillas = true;
     
@@ -502,7 +577,7 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_1(Sensores sensores)
 
 	//Definicion comportamiento
 	if (sensores.agentes[2] == 'r') {
-		// Si hay un auxiliar delante, evitamos la colisión
+		// Si hay un rescatador delante, evitamos la colisión
 		accion = IDLE;
 	} else if (giro45Izq != 0)	//Estoy haciendo TURN_SL
 	{
@@ -514,8 +589,15 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_1(Sensores sensores)
 		char c = CasillaViableA(sensores.superficie[2], sensores.cota[2]-sensores.cota[0]);
 		char d = CasillaViableA(sensores.superficie[3], sensores.cota[3]-sensores.cota[0]);
 	
-		int pos = CasillaMasDesconocidaA(i, c, d, sensores.posF, sensores.posC, sensores.rumbo, mapaResultado);
+		int df[5], dc[5];
+    	DireccionesDesdeRumboA(sensores.rumbo, df, dc);
 		
+		int vi = mapa_visitas[sensores.posF + df[1]][sensores.posC + dc[1]];	// Visitas Izquierda
+		int vc = mapa_visitas[sensores.posF + df[2]][sensores.posC + dc[2]];	// Visitas Centro
+		int vd = mapa_visitas[sensores.posF + df[3]][sensores.posC + dc[3]];	// Visitas Derecha
+
+		int pos = CasillaMasDesconocidaA(i, c, d, sensores.posF, sensores.posC, sensores.rumbo, mapaResultado, vi, vc, vd);
+
 		switch(pos)
 		{
 		case 2:
@@ -530,7 +612,7 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_1(Sensores sensores)
 			accion = TURN_SR;
 			break;
 		case 0:
-			int pos2 = VeoCasillaInteresanteA_N1(i, c, d, tiene_zapatillas);
+			int pos2 = VeoCasillaInteresanteA_N1(i, c, d, tiene_zapatillas, df, dc, vi, vc, vd);
 		    
 			switch(pos2)
 			{

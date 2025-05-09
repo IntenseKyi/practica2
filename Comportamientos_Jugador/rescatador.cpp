@@ -1,6 +1,8 @@
 #include "../Comportamientos_Jugador/rescatador.hpp"
 #include "motorlib/util.h"
 
+#include <iostream>
+
 Action ComportamientoRescatador::think(Sensores sensores)
 {
 	Action accion = IDLE;
@@ -32,6 +34,21 @@ int ComportamientoRescatador::interact(Action accion, int valor)
 	return 0;
 }
 
+int costeTerreno_R(char terreno)
+{
+    switch (terreno) {
+    case 'T': return 1;  // Tierra/camino
+    case 'S': return 1;  // Sendero
+    case 'C': return 1;  // Ciudad
+    case 'D': return 1;  // Zapatillas
+    case 'A': return 5;  // Agua
+    case 'B': return 1000;  // Bosque
+    case 'M': return 1000; // Montaña (intransitable)
+    case 'P': return 1000; // Precipicio
+    default:  return 100;  // Desconocido o peligroso
+    }
+}
+
 int VeoCasillaInteresanteR_N0 (char i, char c, char d, bool zap)
 {
 	if (c == 'X') return 2;
@@ -51,7 +68,9 @@ int VeoCasillaInteresanteR_N0 (char i, char c, char d, bool zap)
 
 int VeoCasillaInteresanteR_N1 (char i, char c, char d, bool zap, int posF, int posC, int df[5], int dc[5], int vi, int vc, int vd)
 {
-	int menor_visita = min(vi, (vc, vd));
+	/*//int menor_visita = min(vi, (vc, vd));
+
+	std::cout << "Interesante-Visitas i: " << vi << " c: " << vc << " d: " << vd << "\n";
 
 	if (!zap)
 	{
@@ -59,10 +78,61 @@ int VeoCasillaInteresanteR_N1 (char i, char c, char d, bool zap, int posF, int p
 		else if (i == 'D') return 1;
 		else if (d == 'D') return 3;
 	}
-	if (c != 'M' && c != 'P' && c != 'B' && vc == menor_visita) return 2;
-	else if (i != 'M' && i != 'P' && i != 'B' && vi == menor_visita) return 1;
-	else if (d != 'M' && d != 'P' && d != 'B' && vd == menor_visita) return 3;
-	else return 0;
+	// if (c != 'M' && c != 'P' && c != 'B' && vc == menor_visita) return 2;
+	// if (i != 'M' && i != 'P' && i != 'B' && vi == menor_visita) return 1;
+	// if (d != 'M' && d != 'P' && d != 'B' && vd == menor_visita) return 3;
+
+	bool transitable_i = (i != 'M' && i != 'P' && i != 'B');
+    bool transitable_c = (c != 'M' && c != 'P' && c != 'B');
+    bool transitable_d = (d != 'M' && d != 'P' && d != 'B');
+
+	// Primero intentamos elegir la casilla transitable con menor visitas
+    int mejor = 0;
+    int menor = 1e9;
+
+    if (transitable_c && vc < menor) {
+        menor = vc;
+        mejor = 2;
+    }
+    if (transitable_i && vi < menor) {
+        menor = vi;
+        mejor = 1;
+    }
+    if (transitable_d && vd < menor) {
+        menor = vd;
+        mejor = 3;
+    }
+
+    return mejor;
+
+	//return 0; // si todo falla
+*/
+
+	struct Opcion {
+        int direccion; // 1 izq, 2 centro, 3 der
+        int visitas;
+        int coste;
+    };
+
+    std::vector<Opcion> opciones;
+
+    if (c != 'M' && c != 'P') opciones.push_back({2, vc, costeTerreno_R(c)});
+    if (i != 'M' && i != 'P') opciones.push_back({1, vi, costeTerreno_R(i)});
+    if (d != 'M' && d != 'P') opciones.push_back({3, vd, costeTerreno_R(d)});
+
+    // Penaliza coste y visitas: peso relativo (visitas + coste*2)
+    int mejor = 0;
+    int min_punt = 1e9;
+
+    for (auto op : opciones) {
+        int puntuacion = op.visitas + op.coste * 2;
+        if (puntuacion < min_punt) {
+            mejor = op.direccion;
+            min_punt = puntuacion;
+        }
+    }
+
+    return mejor; // 1, 2, 3 o 0 si nada
 }
 
 char CasillaViableR (char casilla, int dif, bool zap)
@@ -441,6 +511,9 @@ void DireccionesDesdeRumboR(const Orientacion &rumbo, int df[5], int dc[5]) {
 // 	}
 // }
 
+
+
+
 int CasillaMasDesconocidaR(char i, char c, char d,
 							int fila, int col,
 							const Orientacion &rumbo,
@@ -448,19 +521,23 @@ int CasillaMasDesconocidaR(char i, char c, char d,
 							int vi, int vc, int vd) {
 	int desconocidos[3] = {0, 0, 0};
 	int df[5], dc[5];
+
+	//std::cout << "Desconozco-Visitas i: " << vi << " c: " << vc << " d: " << vd << "\n";
 	
 	DireccionesDesdeRumboR(rumbo, df, dc);
 	int menor_visita = min(vi, (vc, vd));
-
-	for (int k = 0; k < 5; k+2) {
+	
+	int i_desconocidos = 0;
+	for (int k = 0; k < 5; k+=2) {
 		int nf = fila + df[k];
 		int nc = col + dc[k];
 		if (nf >= 0 && nf < mapaResultado.size() &&
 		nc >= 0 && nc < mapaResultado[0].size()) {
 			if (mapaResultado[nf][nc] == '?') {
-				desconocidos[k-(k/2)] = 1;
+				desconocidos[i_desconocidos] = 1;
 			}
 		}
+		i_desconocidos++;
 	}
 
 	if (desconocidos[1] && vc == menor_visita) return 2; // Frente
