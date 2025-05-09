@@ -48,15 +48,44 @@ int costeTerreno_A(char terreno)
     }
 }
 
-int VeoCasillaInteresanteA_N0 (char i, char c, char d)
+int VeoCasillaInteresanteA_N0 (char i, char c, char d, int vc, int vi, int vd)
 {
+	struct Opcion {
+		int direccion;
+		int visitas;
+	};
+
 	if (c == 'X') return 2;
 	else if (i == 'X') return 1;
 	else if (d == 'X') return 3;
-	else if (c == 'C') return 2;
-	else if (i == 'C') return 1;
-	else if (d == 'C') return 3;
-	else return 0;
+
+	std::vector<Opcion> opciones;
+
+	if (c == 'C' || c == 'D') opciones.push_back({2, vc});
+	if (i == 'C' || i == 'D') opciones.push_back({1, vi});
+	if (d == 'C' || d == 'D') opciones.push_back({3, vd});
+
+	// Penaliza coste y visitas: peso relativo (visitas + coste*2)
+    int mejor = 0;
+    int min_punt = 1e9;
+
+    for (auto op : opciones) {
+        int puntuacion = op.visitas;
+        if (puntuacion < min_punt) {
+            mejor = op.direccion;
+            min_punt = puntuacion;
+        }
+    }
+
+    return mejor; // 1, 2, 3 o 0 si nada
+	
+	// if (c == 'X') return 2;
+	// else if (i == 'X') return 1;
+	// else if (d == 'X') return 3;
+	// else if (c == 'C') return 2;
+	// else if (i == 'C') return 1;
+	// else if (d == 'C') return 3;
+	// else return 0;
 }
 
 int VeoCasillaInteresanteA_N1 (char i, char c, char d, bool zap, int df[5], int dc[5], int vi, int vc, int vd)
@@ -506,6 +535,7 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_0(Sensores sensores)
     Action accion = IDLE;
 
 	//Actualizo variables de estado
+	mapa_visitas[sensores.posF][sensores.posC]++;
 	SituarSensorEnMapaA(mapaResultado, mapaCotas, sensores);
     if (sensores.superficie[0] == 'D') tiene_zapatillas = true;
     
@@ -533,7 +563,14 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_0(Sensores sensores)
 		char c = CasillaViableA(sensores.superficie[2], sensores.cota[2]-sensores.cota[0]);
 		char d = CasillaViableA(sensores.superficie[3], sensores.cota[3]-sensores.cota[0]);
 	
-		int pos = VeoCasillaInteresanteA_N0(i, c, d);
+		int df[5], dc[5];
+    	DireccionesDesdeRumboA(sensores.rumbo, df, dc);
+		
+		int vi = mapa_visitas[sensores.posF + df[1]][sensores.posC + dc[1]];	// Visitas Izquierda
+		int vc = mapa_visitas[sensores.posF + df[2]][sensores.posC + dc[2]];	// Visitas Centro
+		int vd = mapa_visitas[sensores.posF + df[3]][sensores.posC + dc[3]];	// Visitas Derecha
+
+		int pos = VeoCasillaInteresanteA_N0(i, c, d, vi, vc, vd);
 		switch(pos)
 		{
 		case 2:
