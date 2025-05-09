@@ -60,6 +60,13 @@ int VeoCasillaInteresanteR_N0 (char i, char c, char d, bool zap, int vc, int vi,
 	else if (i == 'X') return 1;
 	else if (d == 'X') return 3;
 
+	if (!zap)
+	{
+		if (c == 'D') return 2;
+		else if (i == 'D') return 1;
+		else if (d == 'D') return 3;
+	}
+
 	std::vector<Opcion> opciones;
 
 	if (c == 'C' || c == 'D') opciones.push_back({2, vc});

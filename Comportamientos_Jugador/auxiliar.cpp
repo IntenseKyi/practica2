@@ -48,7 +48,7 @@ int costeTerreno_A(char terreno)
     }
 }
 
-int VeoCasillaInteresanteA_N0 (char i, char c, char d, int vc, int vi, int vd)
+int VeoCasillaInteresanteA_N0 (char i, char c, char d, bool zap, int vc, int vi, int vd)
 {
 	struct Opcion {
 		int direccion;
@@ -58,6 +58,13 @@ int VeoCasillaInteresanteA_N0 (char i, char c, char d, int vc, int vi, int vd)
 	if (c == 'X') return 2;
 	else if (i == 'X') return 1;
 	else if (d == 'X') return 3;
+
+	if (!zap)
+	{
+		if (c == 'D') return 2;
+		else if (i == 'D') return 1;
+		else if (d == 'D') return 3;
+	}
 
 	std::vector<Opcion> opciones;
 
@@ -570,7 +577,7 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_0(Sensores sensores)
 		int vc = mapa_visitas[sensores.posF + df[2]][sensores.posC + dc[2]];	// Visitas Centro
 		int vd = mapa_visitas[sensores.posF + df[3]][sensores.posC + dc[3]];	// Visitas Derecha
 
-		int pos = VeoCasillaInteresanteA_N0(i, c, d, vi, vc, vd);
+		int pos = VeoCasillaInteresanteA_N0(i, c, d, tiene_zapatillas, vi, vc, vd);
 		switch(pos)
 		{
 		case 2:
