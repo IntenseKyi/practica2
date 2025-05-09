@@ -17,6 +17,8 @@ public:
     last_action = IDLE;
     tiene_zapatillas = false;
     giro45Izq = 0;
+    
+    mapa_visitas = vector<vector<int>>(100, vector<int>(100, 0));
   }
   ComportamientoRescatador(std::vector<std::vector<unsigned char>> mapaR, std::vector<std::vector<unsigned char>> mapaC) : Comportamiento(mapaR,mapaC)
   {
@@ -40,6 +42,7 @@ private:
   Action last_action;
   bool tiene_zapatillas;
   int giro45Izq;
+  vector<vector<int>> mapa_visitas;
 };
 
 #endif
