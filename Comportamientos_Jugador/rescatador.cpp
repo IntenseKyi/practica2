@@ -34,20 +34,6 @@ int ComportamientoRescatador::interact(Action accion, int valor)
 	return 0;
 }
 
-int costeTerreno_R(char terreno)
-{
-    switch (terreno) {
-    case 'T': return 1;  // Tierra/camino
-    case 'S': return 1;  // Sendero
-    case 'C': return 1;  // Ciudad
-    case 'D': return 1;  // Zapatillas
-    case 'A': return 5;  // Agua
-    case 'B': return 1000;  // Bosque
-    case 'M': return 1000; // Montaña (intransitable)
-    case 'P': return 1000; // Precipicio
-    default:  return 100;  // Desconocido o peligroso
-    }
-}
 
 int VeoCasillaInteresanteR_N0 (char i, char c, char d, bool zap, int vc, int vi, int vd)
 {
@@ -69,8 +55,9 @@ int VeoCasillaInteresanteR_N0 (char i, char c, char d, bool zap, int vc, int vi,
 	if (i == 'C' || i == 'D') opciones[0] = vi;
 	if (d == 'C' || d == 'D') opciones[2] = vd;
 
-	// Penaliza coste y visitas: peso relativo (visitas + coste*2)
-    int menor_visitas = min(vc, min(vi, vd));
+
+	int menor_visitas = vc < vi ? vc : vi;
+	menor_visitas = menor_visitas < vd ? menor_visitas : vd;
 
     bool puede_avanzar[3] = {false, false, false};
 	for (int k = 0; k < 3; k++)
