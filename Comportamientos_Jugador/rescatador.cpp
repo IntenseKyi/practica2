@@ -37,52 +37,47 @@ int ComportamientoRescatador::interact(Action accion, int valor)
 
 int VeoCasillaInteresanteR_N0 (char i, char c, char d, bool zap, int vc, int vi, int vd)
 {
-	if (c == 'X') return 2;
-	else if (i == 'X') return 1;
-	else if (d == 'X') return 3;
+	// 1. Objetivo a la vista
+    if (c == 'X') return 2;
+    if (i == 'X') return 1;
+    if (d == 'X') return 3;
 
-	if (!zap)
-	{
-		if (c == 'D') return 2;
-		else if (i == 'D') return 1;
-		else if (d == 'D') return 3;
-	}
+    // 2. Zapatillas y destino
+    if (!zap) {
+        if (c == 'D') return 2;
+        if (i == 'D') return 1;
+        if (d == 'D') return 3;
+    }
 
-	int opciones[3] = {-1, -1, -1};
-	int casillas[3] = {i, c, d};
+    // 3. Casillas transitables
+    bool transitable[3] = {false, false, false};
+    if (i == 'C' || i == 'D') transitable[0] = true;
+    if (c == 'C' || c == 'D') transitable[1] = true;
+    if (d == 'C' || d == 'D') transitable[2] = true;
 
-	if (c == 'C' || c == 'D') opciones[1] = vc;
-	if (i == 'C' || i == 'D') opciones[0] = vi;
-	if (d == 'C' || d == 'D') opciones[2] = vd;
+    // 4. Emparejar visitas con casillas
+    int visitas[3] = {vi, vc, vd};
+    int mejor = 9999;
+    int opcion[3] = {0, 0, 0};
+
+    for (int k = 0; k < 3; ++k) {
+        if (transitable[k] && visitas[k] <= mejor) {
+            mejor = visitas[k];
+            opcion[k] = 1;
+        }
+    }
+    
+    std::cout << "Delante " << i << " " << c << " " << d << endl;
+	std::cout << "Visitas " << vi << " " << vc << " " << vd << endl;
+	std::cout << "Menor visitas: " << mejor << endl;
+	std::cout << "Opciones " << opcion[0] << " " << opcion[1] << " " << opcion[2] << endl << endl;
 
 
-	int menor_visitas = vc < vi ? vc : vi;
-	menor_visitas = menor_visitas < vd ? menor_visitas : vd;
-
-    bool puede_avanzar[3] = {false, false, false};
-	for (int k = 0; k < 3; k++)
-	{
-		if (opciones[k] >= 0 && opciones[k] == menor_visitas)
-		{
-			puede_avanzar[k] = true;
-		}
-	}
-
-	if (puede_avanzar[1]) return 2;
-	if (puede_avanzar[0]) return 1;
-	if (puede_avanzar[2]) return 3;
-	return 0;
-
-	// else if (!zap)
-	// {
-	// 	if (c == 'D') return 2;
-	// 	else if (i == 'D') return 1;
-	// 	else if (d == 'D') return 3;
-	// }
-	// if (c == 'C') return 2;
-	// else if (i == 'C') return 1;
-	// else if (d == 'C') return 3;
-	// else return 0;
+	if (opcion[1] && visitas[1] == mejor) return 2;
+	if (opcion[0] && visitas[0] == mejor) return 1;
+	if (opcion[2] && visitas[2] == mejor) return 3;
+    return 0; // Nada interesante
+}
 }
 
 int VeoCasillaInteresanteR_N1 (char i, char c, char d, bool zap, int posF, int posC, int df[5], int dc[5], int vi, int vc, int vd)
@@ -536,8 +531,12 @@ Action ComportamientoRescatador::ComportamientoRescatadorNivel_0(Sensores sensor
 			accion = TURN_SR;
 			break;
 		case 0:
-			accion = TURN_L;
-			break;
+			if (c == 'C' || c == 'D'){
+				mapa_visitas[sensores.posF][sensores.posC]++;
+				accion = WALK;
+			} else accion = TURN_L;
+				break;
+			}
 		}
 	}
 	
