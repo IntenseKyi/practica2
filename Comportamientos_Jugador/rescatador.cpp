@@ -37,54 +37,6 @@ int ComportamientoRescatador::interact(Action accion, int valor)
 
 int VeoCasillaInteresanteR_N0 (char i, char c, char d, bool zap, int vi, int vc, int vd)
 {
-	/*if (c == 'X') return 2;
-	else if (i == 'X') return 1;
-	else if (d == 'X') return 3;
-
-	if (!zap)
-	{
-		if (c == 'D') return 2;
-		else if (i == 'D') return 1;
-		else if (d == 'D') return 3;
-	}
-
-	int max_visitas = 9999;
-	int opciones[3] = {max_visitas, max_visitas, max_visitas};
-
-	if (c == 'C' || c == 'D') opciones[1] = vc;
-	if (i == 'C' || c == 'D') opciones[0] = vi;
-	if (d == 'C' || c == 'D') opciones[2] = vd;
-
-<<<<<<< HEAD
-	// Penaliza coste y visitas: peso relativo (visitas + coste*2)
-    int menor_visitas = opciones[1] < opciones[0] ? opciones[1] : opciones[0];
-	menor_visitas = menor_visitas < opciones[2] ? menor_visitas : opciones[2];
-=======
-
-	int menor_visitas = vc < vi ? vc : vi;
-	menor_visitas = menor_visitas < vd ? menor_visitas : vd;
->>>>>>> 0ce8fdce43160ab136c1aaa617a7d218cfd916ee
-
-    bool puede_avanzar[3] = {false, false, false};
-	for (int k = 0; k < 3; k++)
-	{
-		if (opciones[k] < max_visitas && opciones[k] == menor_visitas)
-		{
-			puede_avanzar[k] = true;
-		}
-	}
-
-
-	std::cout << "Delante " << i << " " << c << " " << d << endl;
-	std::cout << "Visitas " << vi << " " << vc << " " << vd << endl;
-	std::cout << "Menor visitas: " << menor_visitas << endl << endl;
-
-	if (puede_avanzar[1]) return 2;
-	if (puede_avanzar[0]) return 1;
-	if (puede_avanzar[2]) return 3;
-	return 0;*/
-
-
     // 1. Objetivo a la vista
     if (c == 'X') return 2;
     if (i == 'X') return 1;
@@ -115,10 +67,10 @@ int VeoCasillaInteresanteR_N0 (char i, char c, char d, bool zap, int vi, int vc,
         }
     }
     
-    std::cout << "Delante " << i << " " << c << " " << d << endl;
-	std::cout << "Visitas " << vi << " " << vc << " " << vd << endl;
-	std::cout << "Menor visitas: " << mejor << endl;
-	std::cout << "Opciones " << opcion[0] << " " << opcion[1] << " " << opcion[2] << endl << endl;
+    //std::cout << "Delante " << i << " " << c << " " << d << endl;
+	//std::cout << "Visitas " << vi << " " << vc << " " << vd << endl;
+	//std::cout << "Menor visitas: " << mejor << endl;
+	//std::cout << "Opciones " << opcion[0] << " " << opcion[1] << " " << opcion[2] << endl << endl;
 
 
 	if (opcion[1] && visitas[1] == mejor) return 2;
@@ -541,16 +493,16 @@ Action ComportamientoRescatador::ComportamientoRescatadorNivel_0(Sensores sensor
     if (sensores.superficie[0] == 'D') tiene_zapatillas = true;
 
 	//Definicion comportamiento
-	if (sensores.agentes[2] == 'a') {
+	if (sensores.superficie[0] == 'X') {
 		// Si hay un auxiliar delante, evitamos la colisión
-		accion = TURN_L;
-	} else if (sensores.superficie[0] == 'X')	//Llego al objetivo
-	{
 		accion = IDLE;
 	} else if (giro45Izq != 0)	//Estoy haciendo TURN_SL
 	{
 		accion = TURN_SR;
 		giro45Izq--;
+	} else if (sensores.agentes[2] == 'a')	//Llego al objetivo
+	{
+		accion = TURN_L;
 	} else
 	{
 		char i = CasillaViableR(sensores.superficie[1], sensores.cota[1]-sensores.cota[0], tiene_zapatillas);

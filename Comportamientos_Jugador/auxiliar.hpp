@@ -16,8 +16,7 @@ public:
     // Inicializar Variables de Estado Niveles 0,1,4
     last_action = IDLE;
     tiene_zapatillas = false;
-    giro45Izq = 0;
-    girarIzq = 0;
+    girosDcha = 0;
 
     for (int i = 0; i < 100; i++)
       for (int j = 0; j < 100; j++)
@@ -44,8 +43,7 @@ private:
   // Definir Variables de Estado
   Action last_action;
   bool tiene_zapatillas;
-  int giro45Izq;
-  int girarIzq;
+  int girosDcha;
 
   int mapa_visitas[100][100];
 };

@@ -33,115 +33,54 @@ int ComportamientoAuxiliar::interact(Action accion, int valor)
 	return 0;
 }
 
-int costeTerreno_A(char terreno)
+
+int VeoCasillaInteresanteA_N0 (char i, char c, char d, bool zap, int vi, int vc, int vd)
 {
-    switch (terreno) {
-    case 'T': return 1;  // Tierra/camino
-    case 'S': return 1;  // Sendero
-    case 'C': return 1;  // Ciudad
-    case 'D': return 1;  // Zapatillas
-    case 'A': return 5;  // Agua
-    case 'B': return 5;  // Bosque
-    case 'M': return 1000; // Montaña (intransitable)
-    case 'P': return 1000; // Precipicio
-    default:  return 100;  // Desconocido o peligroso
+    // 1. Objetivo a la vista
+    if (c == 'X') return 2;
+    if (i == 'X') return 1;
+    if (d == 'X') return 3;
+
+    // 2. Zapatillas y destino
+    if (!zap) {
+        if (c == 'D') return 2;
+        if (i == 'D') return 1;
+        if (d == 'D') return 3;
     }
-}
 
-int VeoCasillaInteresanteA_N0 (char i, char c, char d, bool zap, int vc, int vi, int vd)
-{
-	struct Opcion {
-		int direccion;
-		int visitas;
-	};
+    // 3. Casillas transitables
+    bool transitable[3] = {false, false, false};
+    if (i == 'C' || i == 'D') transitable[0] = true;
+    if (c == 'C' || c == 'D') transitable[1] = true;
+    if (d == 'C' || d == 'D') transitable[2] = true;
 
-	if (c == 'X') return 2;
-	else if (i == 'X') return 1;
-	else if (d == 'X') return 3;
+    // 4. Emparejar visitas con casillas
+    int visitas[3] = {vi, vc, vd};
+    int mejor = 9999;
+    int opcion[3] = {0, 0, 0};
 
-	if (!zap)
-	{
-		if (c == 'D') return 2;
-		else if (i == 'D') return 1;
-		else if (d == 'D') return 3;
-	}
-
-	std::vector<Opcion> opciones;
-
-	if (c == 'C' || c == 'D') opciones.push_back({2, vc});
-	if (i == 'C' || i == 'D') opciones.push_back({1, vi});
-	if (d == 'C' || d == 'D') opciones.push_back({3, vd});
-
-	// Penaliza coste y visitas: peso relativo (visitas + coste*2)
-    int mejor = 0;
-    int min_punt = 1e9;
-
-    for (auto op : opciones) {
-        int puntuacion = op.visitas;
-        if (puntuacion < min_punt) {
-            mejor = op.direccion;
-            min_punt = puntuacion;
+    for (int k = 0; k < 3; ++k) {
+        if (transitable[k] && visitas[k] <= mejor) {
+            mejor = visitas[k];
+            opcion[k] = 1;
         }
     }
+    
+    std::cout << "Delante " << i << " " << c << " " << d << endl;
+	std::cout << "Visitas " << vi << " " << vc << " " << vd << endl;
+	std::cout << "Menor visitas: " << mejor << endl;
+	std::cout << "Opciones " << opcion[0] << " " << opcion[1] << " " << opcion[2] << endl << endl;
 
-    return mejor; // 1, 2, 3 o 0 si nada
-	
-	// if (c == 'X') return 2;
-	// else if (i == 'X') return 1;
-	// else if (d == 'X') return 3;
-	// else if (c == 'C') return 2;
-	// else if (i == 'C') return 1;
-	// else if (d == 'C') return 3;
-	// else return 0;
+
+	if (opcion[1] && visitas[1] == mejor) return 2;
+	if (opcion[0] && visitas[0] == mejor) return 1;
+	if (opcion[2] && visitas[2] == mejor) return 3;
+    return 0; // Nada interesante
 }
 
 int VeoCasillaInteresanteA_N1 (char i, char c, char d, bool zap, int df[5], int dc[5], int vi, int vc, int vd)
 {
-	/*if (!zap)
-	{
-		if (c == 'D') return 2;
-		else if (i == 'D') return 1;
-		else if (d == 'D') return 3;
-	}
-	if (c != 'M' && c != 'P')
-	{
-		if (!(!zap && c == 'B')) return 2;
-	}
-	else if (i != 'M' && i != 'P' && i != 'B')
-	{
-		if (!(!zap && c == 'B')) return 1;
-	}
-	else if (d != 'M' && d != 'P' && d != 'B')
-	{
-		if (!(!zap && c == 'B')) return 3;
-	}
-	else return 0;*/
-
-	struct Opcion {
-        int direccion; // 1 izq, 2 centro, 3 der
-        int visitas;
-        int coste;
-    };
-
-    std::vector<Opcion> opciones;
-
-    if (c != 'M' && c != 'P') opciones.push_back({2, vc, costeTerreno_A(c)});
-    if (i != 'M' && i != 'P') opciones.push_back({1, vi, costeTerreno_A(i)});
-    if (d != 'M' && d != 'P') opciones.push_back({3, vd, costeTerreno_A(d)});
-
-    // Penaliza coste y visitas: peso relativo (visitas + coste*2)
-    int mejor = 0;
-    int min_punt = 1e9;
-
-    for (auto op : opciones) {
-        int puntuacion = op.visitas + op.coste * 2;
-        if (puntuacion < min_punt) {
-            mejor = op.direccion;
-            min_punt = puntuacion;
-        }
-    }
-
-    return mejor; // 1, 2, 3 o 0 si nada
+	return 0;
 }
 
 char CasillaViableA (char casilla, int dif)
@@ -542,28 +481,21 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_0(Sensores sensores)
     Action accion = IDLE;
 
 	//Actualizo variables de estado
-	mapa_visitas[sensores.posF][sensores.posC]++;
 	SituarSensorEnMapaA(mapaResultado, mapaCotas, sensores);
     if (sensores.superficie[0] == 'D') tiene_zapatillas = true;
     
-    //Tiene que girar a la izquierda
-    if (girarIzq > 0)
-    {
-    	girarIzq--;
-    	return TURN_SR;
-    }
 
 	//Definicion comportamiento
-	if (sensores.agentes[2] == 'r') {
+	if (sensores.superficie[0] == 'X') {
 		// Si hay un auxiliar delante, evitamos la colisión
 		accion = IDLE;
-	} else if (sensores.superficie[0] == 'X')	//Llego al objetivo
-	{
-		accion = IDLE;
-	} else if (giro45Izq != 0)	//Estoy haciendo TURN_SL
+	} else if (girosDcha != 0)	//Estoy haciendo TURN_SL
 	{
 		accion = TURN_SR;
-		giro45Izq--;
+		girosDcha--;
+	} else if (sensores.agentes[2] == 'r')	//Llego al objetivo
+	{
+		accion = IDLE;
 	} else 
 	{
 		char i = CasillaViableA(sensores.superficie[1], sensores.cota[1]-sensores.cota[0]);
@@ -581,19 +513,22 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_0(Sensores sensores)
 		switch(pos)
 		{
 		case 2:
+			mapa_visitas[sensores.posF][sensores.posC]++;
 			accion = WALK;
 			break;
 		case 1:
-			giro45Izq = 1;
-			girarIzq = 5;
+			girosDcha = 6;
 			accion = TURN_SR;
 			break;
 		case 3:
 			accion = TURN_SR;
 			break;
 		case 0:
-			girarIzq = 5;
-			accion = TURN_SR;
+			if (c == 'C' || c == 'D'){
+				mapa_visitas[sensores.posF][sensores.posC]++;
+				accion = WALK;
+			}
+			else accion = TURN_SR;
 			break;
 		}
 	}
@@ -612,21 +547,15 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_1(Sensores sensores)
 	SituarSensorEnMapaA(mapaResultado, mapaCotas, sensores);
     if (sensores.superficie[0] == 'D') tiene_zapatillas = true;
     
-    //Tiene que girar a la izquierda
-    if (girarIzq > 0)
-    {
-    	girarIzq--;
-    	return TURN_SR;
-    }
 
 	//Definicion comportamiento
 	if (sensores.agentes[2] == 'r') {
 		// Si hay un rescatador delante, evitamos la colisión
 		accion = IDLE;
-	} else if (giro45Izq != 0)	//Estoy haciendo TURN_SL
+	} else if (girosDcha != 0)	//Estoy haciendo TURN_SL
 	{
 		accion = TURN_SR;
-		giro45Izq--;
+		girosDcha--;
 	} else 
 	{
 		char i = CasillaViableA(sensores.superficie[1], sensores.cota[1]-sensores.cota[0]);
@@ -648,8 +577,7 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_1(Sensores sensores)
 			accion = WALK;
 			break;
 		case 1:
-			giro45Izq = 1;
-			girarIzq = 5;
+			girosDcha = 6;
 			accion = TURN_SR;
 			break;
 		case 3:
@@ -665,8 +593,7 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_1(Sensores sensores)
 				
 				break;
 			case 1:
-				giro45Izq = 1;
-				girarIzq = 5;
+				girosDcha = 6;
 				accion = TURN_SR;
 				break;
 			case 3:
@@ -674,7 +601,7 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_1(Sensores sensores)
 				
 				break;
 			case 0:
-				girarIzq = 5;
+				girosDcha = 5;
 				accion = TURN_SR;
 				break;
 			}
