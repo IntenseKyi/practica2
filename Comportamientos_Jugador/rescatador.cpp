@@ -35,9 +35,57 @@ int ComportamientoRescatador::interact(Action accion, int valor)
 }
 
 
-int VeoCasillaInteresanteR_N0 (char i, char c, char d, bool zap, int vc, int vi, int vd)
+int VeoCasillaInteresanteR_N0 (char i, char c, char d, bool zap, int vi, int vc, int vd)
 {
-	// 1. Objetivo a la vista
+	/*if (c == 'X') return 2;
+	else if (i == 'X') return 1;
+	else if (d == 'X') return 3;
+
+	if (!zap)
+	{
+		if (c == 'D') return 2;
+		else if (i == 'D') return 1;
+		else if (d == 'D') return 3;
+	}
+
+	int max_visitas = 9999;
+	int opciones[3] = {max_visitas, max_visitas, max_visitas};
+
+	if (c == 'C' || c == 'D') opciones[1] = vc;
+	if (i == 'C' || c == 'D') opciones[0] = vi;
+	if (d == 'C' || c == 'D') opciones[2] = vd;
+
+<<<<<<< HEAD
+	// Penaliza coste y visitas: peso relativo (visitas + coste*2)
+    int menor_visitas = opciones[1] < opciones[0] ? opciones[1] : opciones[0];
+	menor_visitas = menor_visitas < opciones[2] ? menor_visitas : opciones[2];
+=======
+
+	int menor_visitas = vc < vi ? vc : vi;
+	menor_visitas = menor_visitas < vd ? menor_visitas : vd;
+>>>>>>> 0ce8fdce43160ab136c1aaa617a7d218cfd916ee
+
+    bool puede_avanzar[3] = {false, false, false};
+	for (int k = 0; k < 3; k++)
+	{
+		if (opciones[k] < max_visitas && opciones[k] == menor_visitas)
+		{
+			puede_avanzar[k] = true;
+		}
+	}
+
+
+	std::cout << "Delante " << i << " " << c << " " << d << endl;
+	std::cout << "Visitas " << vi << " " << vc << " " << vd << endl;
+	std::cout << "Menor visitas: " << menor_visitas << endl << endl;
+
+	if (puede_avanzar[1]) return 2;
+	if (puede_avanzar[0]) return 1;
+	if (puede_avanzar[2]) return 3;
+	return 0;*/
+
+
+    // 1. Objetivo a la vista
     if (c == 'X') return 2;
     if (i == 'X') return 1;
     if (d == 'X') return 3;
@@ -77,7 +125,6 @@ int VeoCasillaInteresanteR_N0 (char i, char c, char d, bool zap, int vc, int vi,
 	if (opcion[0] && visitas[0] == mejor) return 1;
 	if (opcion[2] && visitas[2] == mejor) return 3;
     return 0; // Nada interesante
-}
 }
 
 int VeoCasillaInteresanteR_N1 (char i, char c, char d, bool zap, int posF, int posC, int df[5], int dc[5], int vi, int vc, int vd)
@@ -380,7 +427,7 @@ void SituarSensorEnMapaR(vector<vector<unsigned char>> &m, vector<vector<unsigne
 	}
 } 
 
-void DireccionesDesdeRumboR(const Orientacion &rumbo, int df[5], int dc[5]) {
+void DireccionesDesdeRumboR(const Orientacion &rumbo, int df[3], int dc[3]) {
     switch (rumbo) {
     case norte:
         df[0] = -1; dc[0] = -1;  // izq+frente
@@ -453,15 +500,15 @@ int CasillaMasDesconocidaR(char i, char c, char d,
 							const vector<vector<unsigned char>> &mapaResultado,
 							int vi, int vc, int vd) {
 	int desconocidos[3] = {0, 0, 0};
-	int df[5], dc[5];
+	int df[3], dc[3];
 
 	//std::cout << "Desconozco-Visitas i: " << vi << " c: " << vc << " d: " << vd << "\n";
 	
 	DireccionesDesdeRumboR(rumbo, df, dc);
-	int menor_visita = min(vi, min(vc, vd));
+	int menor_visita = -1;
 	
 	int i_desconocidos = 0;
-	for (int k = 0; k < 5; k+=2) {
+	for (int k = 0; k < 3; k++) {
 		int nf = fila + df[k];
 		int nc = col + dc[k];
 		if (nf >= 0 && nf < mapaResultado.size() &&
@@ -489,7 +536,7 @@ Action ComportamientoRescatador::ComportamientoRescatadorNivel_0(Sensores sensor
     Action accion = IDLE;
 
 	//Actualizo variables de estado
-	mapa_visitas[sensores.posF][sensores.posC]++;
+	
 	SituarSensorEnMapaR(mapaResultado, mapaCotas, sensores);
     if (sensores.superficie[0] == 'D') tiene_zapatillas = true;
 
@@ -510,18 +557,22 @@ Action ComportamientoRescatador::ComportamientoRescatadorNivel_0(Sensores sensor
 		char c = CasillaViableR(sensores.superficie[2], sensores.cota[2]-sensores.cota[0], tiene_zapatillas);
 		char d = CasillaViableR(sensores.superficie[3], sensores.cota[3]-sensores.cota[0], tiene_zapatillas);
 
-		int df[5], dc[5];
+		int df[3], dc[3];
     	DireccionesDesdeRumboR(sensores.rumbo, df, dc);
 		
-		int vi = mapa_visitas[sensores.posF + df[1]][sensores.posC + dc[1]];	// Visitas Izquierda
-		int vc = mapa_visitas[sensores.posF + df[2]][sensores.posC + dc[2]];	// Visitas Centro
-		int vd = mapa_visitas[sensores.posF + df[3]][sensores.posC + dc[3]];	// Visitas Derecha
+		int vi = mapa_visitas[sensores.posF + df[0]][sensores.posC + dc[0]];	// Visitas Izquierda
+		int vc = mapa_visitas[sensores.posF + df[1]][sensores.posC + dc[1]];	// Visitas Centro
+		int vd = mapa_visitas[sensores.posF + df[2]][sensores.posC + dc[2]];	// Visitas Derecha
+
+		
+		
 
 		int pos = VeoCasillaInteresanteR_N0(i, c, d, tiene_zapatillas, vi, vc, vd);
 		switch(pos)
 		{
 		case 2:
 			accion = WALK;
+			mapa_visitas[sensores.posF][sensores.posC]++;
 			break;
 		case 1:
 			giro45Izq = 1;
@@ -531,12 +582,11 @@ Action ComportamientoRescatador::ComportamientoRescatadorNivel_0(Sensores sensor
 			accion = TURN_SR;
 			break;
 		case 0:
-			if (c == 'C' || c == 'D'){
-				mapa_visitas[sensores.posF][sensores.posC]++;
+		if (c == 'C' || c == 'D'){
+			mapa_visitas[sensores.posF][sensores.posC]++;
 				accion = WALK;
 			} else accion = TURN_L;
-				break;
-			}
+			break;
 		}
 	}
 	
@@ -550,6 +600,7 @@ Action ComportamientoRescatador::ComportamientoRescatadorNivel_1(Sensores sensor
 
     // Actualizo variables de estado
     mapa_visitas[sensores.posF][sensores.posC]++;
+	std::cout << "Mapa " << mapa_visitas[sensores.posF][sensores.posC] << endl;
     SituarSensorEnMapaR(mapaResultado, mapaCotas, sensores);
     if (sensores.superficie[0] == 'D') tiene_zapatillas = true;
 	
