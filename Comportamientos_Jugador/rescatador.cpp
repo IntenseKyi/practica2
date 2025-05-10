@@ -79,10 +79,96 @@ int VeoCasillaInteresanteR_N0 (char i, char c, char d, bool zap, int vi, int vc,
     return 0; // Nada interesante
 }
 
-int VeoCasillaInteresanteR_N1 (char i, char c, char d, bool zap, int posF, int posC, int df[5], int dc[5], int vi, int vc, int vd)
+int InteresCasilla(char cas)
 {
-	return 0;
+	int devuelve;
+	switch(cas)
+	{
+	case 'C':
+		devuelve = 0;
+		break;
+	case 'S':
+	case 'D':
+		devuelve = 1;
+		break;
+	default:
+		devuelve = 2;
+		break;
+	}
+	
+	return devuelve;
 }
+
+int VeoCasillaInteresanteR_N1 (char i, char c, char d, bool zap, int vi, int vc, int vd)
+{
+
+    // Zapatillas y destino
+    if (!zap) {
+        if (c == 'D') return 2;
+        if (i == 'D') return 1;
+        if (d == 'D') return 3;
+    }
+
+    // 3. Casillas transitables
+    bool transitable[3] = {false, false, false};
+    if (i == 'C' || i == 'D' || i == 'S' || i == 'X') transitable[0] = true;
+    if (c == 'C' || c == 'D' || c == 'S' || c == 'X') transitable[1] = true;
+    if (d == 'C' || d == 'D' || d == 'S' || d == 'X') transitable[2] = true;
+    
+    int interes[3] = {
+        InteresCasilla(i),
+        InteresCasilla(c),
+        InteresCasilla(d)
+    };
+
+    // 4. Emparejar visitas con casillas
+    int casillas[3] = {i, c, d};
+    int visitas[3] = {vi, vc, vd};
+    
+    
+    // Inicialización
+    int mejor_interes = 3;
+    int mejor_visita = 9999;
+    
+    bool eleccion[3] = {false, false, false};
+    
+    for (int k = 0; k < 3; ++k) {
+        if (transitable[k])
+        {
+        	if (interes[k] <= mejor_interes)
+        	{
+        		if (visitas[k] <= mejor_visita)
+        		{
+        			mejor_interes = interes[k];
+        			mejor_visita = visitas[k];
+        		
+        			eleccion[k] = true;
+        		}
+        	}
+        
+        
+		}
+    }
+	
+	std::cout << "Delante " << i << " " << c << " " << d << endl;
+	std::cout << "Transitables " << transitable[0] << " " << transitable[1] << " " << transitable[2] << endl;
+	std::cout << "Visitas " << vi << " " << vc << " " << vd << endl;
+	//std::cout << "Mejor visitas: " << visitas[eleccion] << endl;
+	std::cout << "Intereses " << interes[0] << " " << interes[1] << " " << interes[2] << endl;
+	//std::cout << "Mejor interes: " << interes[eleccion] << endl;
+	std::cout << "Eleccion " << eleccion[0] << " " << eleccion[1] << " " << eleccion[2] << endl << endl;
+	
+    // Resultado final
+    //if (!transitable[eleccion]) return 0;
+
+    //return eleccion + 1;  // 1: izquierda, 2: centro, 3: derecha
+    
+    if (eleccion[1] && visitas[1] == mejor_visita && interes[1] == mejor_interes) return 2;
+	if (eleccion[0] && visitas[0] == mejor_visita && interes[0] == mejor_interes) return 1;
+	if (eleccion[2] && visitas[2] == mejor_visita && interes[2] == mejor_interes) return 3;
+    return 0; // Nada interesante
+}
+
 
 char CasillaViableR (char casilla, int dif, bool zap)
 {
@@ -548,81 +634,62 @@ Action ComportamientoRescatador::ComportamientoRescatadorNivel_0(Sensores sensor
 
 Action ComportamientoRescatador::ComportamientoRescatadorNivel_1(Sensores sensores)
 {
+    // Acción inicial por defecto
     Action accion = IDLE;
 
-    // Actualizo variables de estado
-    mapa_visitas[sensores.posF][sensores.posC]++;
-	std::cout << "Mapa " << mapa_visitas[sensores.posF][sensores.posC] << endl;
-    SituarSensorEnMapaR(mapaResultado, mapaCotas, sensores);
-    if (sensores.superficie[0] == 'D') tiene_zapatillas = true;
+	//Actualizo variables de estado
 	
+	SituarSensorEnMapaR(mapaResultado, mapaCotas, sensores);
+    if (sensores.superficie[0] == 'D') tiene_zapatillas = true;
+
 	//Definicion comportamiento
-	if (sensores.agentes[2] == 'a') {
-		// Si hay un auxiliar delante, evitamos la colisión
-		accion = TURN_L;
-	} else if (giro45Izq != 0)	//Estoy haciendo TURN_SL
+	if (giro45Izq != 0)	//Estoy haciendo TURN_SL
 	{
 		accion = TURN_SR;
 		giro45Izq--;
+	} else if (sensores.agentes[2] == 'a')	//Llego al objetivo
+	{
+		accion = TURN_L;
 	} else
 	{
-		// Exploración reactiva: decidir por qué dirección avanzar
 		char i = CasillaViableR(sensores.superficie[1], sensores.cota[1]-sensores.cota[0], tiene_zapatillas);
 		char c = CasillaViableR(sensores.superficie[2], sensores.cota[2]-sensores.cota[0], tiene_zapatillas);
 		char d = CasillaViableR(sensores.superficie[3], sensores.cota[3]-sensores.cota[0], tiene_zapatillas);
-		
-		int df[5], dc[5];
+
+		int df[3], dc[3];
     	DireccionesDesdeRumboR(sensores.rumbo, df, dc);
 		
-		int vi = mapa_visitas[sensores.posF + df[1]][sensores.posC + dc[1]];	// Visitas Izquierda
-		int vc = mapa_visitas[sensores.posF + df[2]][sensores.posC + dc[2]];	// Visitas Centro
-		int vd = mapa_visitas[sensores.posF + df[3]][sensores.posC + dc[3]];	// Visitas Derecha
+		int vi = mapa_visitas[sensores.posF + df[0]][sensores.posC + dc[0]];	// Visitas Izquierda
+		int vc = mapa_visitas[sensores.posF + df[1]][sensores.posC + dc[1]];	// Visitas Centro
+		int vd = mapa_visitas[sensores.posF + df[2]][sensores.posC + dc[2]];	// Visitas Derecha
 
-		int pos = CasillaMasDesconocidaR(i, c, d, sensores.posF, sensores.posC, sensores.rumbo, mapaResultado, vi, vc, vd);
+		
+		
 
-		switch (pos) 
+		int pos = VeoCasillaInteresanteR_N1(i, c, d, tiene_zapatillas, vi, vc, vd);
+		switch(pos)
 		{
 		case 2:
 			accion = WALK;
-		    
-		    break;
+			mapa_visitas[sensores.posF][sensores.posC]++;
+			break;
 		case 1:
 			giro45Izq = 1;
-		    accion = TURN_L;
-		    
-		    break;
+			accion = TURN_L;
+			break;
 		case 3:
 			accion = TURN_SR;
-		    
-		    break;
+			break;
 		case 0:
-			// (char i, char c, char d, bool zap, int posF, int posC, int df[3], int dc[3], int vi, int vc, int vd)
-		    int pos2 = VeoCasillaInteresanteR_N1(i, c, d, tiene_zapatillas, sensores.posF, sensores.posC, df, dc, vi, vc, vd);
-		    
-			switch(pos2)
-			{
-			case 2:
+		if (c == 'C' || c == 'D'){
+			mapa_visitas[sensores.posF][sensores.posC]++;
 				accion = WALK;
-				
-				break;
-			case 1:
-				giro45Izq = 1;
-				accion = TURN_L;
-				
-				break;
-			case 3:
-				accion = TURN_SR;
-				
-				break;
-			case 0:
-				accion = TURN_L;
-				break;
-			}
-		    break;
+			} else accion = TURN_L;
+			break;
 		}
 	}
-
-    last_action = accion;
+	
+	last_action = accion;
     return accion;
 }
 

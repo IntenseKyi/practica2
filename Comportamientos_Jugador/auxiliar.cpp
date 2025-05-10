@@ -541,7 +541,7 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_1(Sensores sensores)
 {
     // Acción inicial por defecto
     Action accion = IDLE;
-
+/*
 	//Actualizo variables de estado
 	mapa_visitas[sensores.posF][sensores.posC]++;
 	SituarSensorEnMapaA(mapaResultado, mapaCotas, sensores);
@@ -610,7 +610,7 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_1(Sensores sensores)
 	}
 	
 	last_action = accion;
-    return accion;
+    return accion;*/
 }
 
 Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_2(Sensores sensores)
