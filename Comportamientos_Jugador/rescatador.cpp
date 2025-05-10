@@ -51,11 +51,6 @@ int costeTerreno_R(char terreno)
 
 int VeoCasillaInteresanteR_N0 (char i, char c, char d, bool zap, int vc, int vi, int vd)
 {
-	struct Opcion {
-		int direccion;
-		int visitas;
-	};
-
 	if (c == 'X') return 2;
 	else if (i == 'X') return 1;
 	else if (d == 'X') return 3;
@@ -67,25 +62,29 @@ int VeoCasillaInteresanteR_N0 (char i, char c, char d, bool zap, int vc, int vi,
 		else if (d == 'D') return 3;
 	}
 
-	std::vector<Opcion> opciones;
+	int opciones[3] = {-1, -1, -1};
+	int casillas[3] = {i, c, d};
 
-	if (c == 'C' || c == 'D') opciones.push_back({2, vc});
-	if (i == 'C' || i == 'D') opciones.push_back({1, vi});
-	if (d == 'C' || d == 'D') opciones.push_back({3, vd});
+	if (c == 'C' || c == 'D') opciones[1] = vc;
+	if (i == 'C' || i == 'D') opciones[0] = vi;
+	if (d == 'C' || d == 'D') opciones[2] = vd;
 
 	// Penaliza coste y visitas: peso relativo (visitas + coste*2)
-    int mejor = 0;
-    int min_punt = 1e9;
+    int menor_visitas = min(vc, min(vi, vd));
 
-    for (auto op : opciones) {
-        int puntuacion = op.visitas;
-        if (puntuacion < min_punt) {
-            mejor = op.direccion;
-            min_punt = puntuacion;
-        }
-    }
+    bool puede_avanzar[3] = {false, false, false};
+	for (int k = 0; k < 3; k++)
+	{
+		if (opciones[k] >= 0 && opciones[k] == menor_visitas)
+		{
+			puede_avanzar[k] = true;
+		}
+	}
 
-    return mejor; // 1, 2, 3 o 0 si nada
+	if (puede_avanzar[1]) return 2;
+	if (puede_avanzar[0]) return 1;
+	if (puede_avanzar[2]) return 3;
+	return 0;
 
 	// else if (!zap)
 	// {
@@ -141,13 +140,6 @@ int VeoCasillaInteresanteR_N1 (char i, char c, char d, bool zap, int posF, int p
 	//return 0; // si todo falla
 */
 
-	struct Opcion {
-        int direccion; // 1 izq, 2 centro, 3 der
-        int visitas;
-        int coste;
-    };
-
-    std::vector<Opcion> opciones;
 
     if (c != 'M' && c != 'P') opciones.push_back({2, vc, costeTerreno_R(c)});
     if (i != 'M' && i != 'P') opciones.push_back({1, vi, costeTerreno_R(i)});
@@ -466,60 +458,44 @@ void SituarSensorEnMapaR(vector<vector<unsigned char>> &m, vector<vector<unsigne
 void DireccionesDesdeRumboR(const Orientacion &rumbo, int df[5], int dc[5]) {
     switch (rumbo) {
     case norte:
-        df[0] = 0;  dc[0] = -1; // izq
-        df[1] = -1; dc[1] = -1;  // izq+frente
-        df[2] = -1;  dc[2] = 0;  // frente
-        df[3] = -1; dc[3] = 1;  // der+frente
-        df[4] = 0;  dc[4] = 1;  // der
+        df[0] = -1; dc[0] = -1;  // izq+frente
+        df[1] = -1;  dc[1] = 0;  // frente
+        df[2] = -1; dc[2] = 1;  // der+frente
         break;
     case noreste:
-        df[0] = -1; dc[0] = -1;
-        df[1] = -1; dc[1] = 0;
-        df[2] = -1;  dc[2] = 1;
-        df[3] = 0; dc[3] = 1;  
-        df[4] = 1;  dc[4] = 1;  
-        break;
-    case este:
         df[0] = -1; dc[0] = 0;
         df[1] = -1;  dc[1] = 1;
-        df[2] = 0;  dc[2] = 1;
-        df[3] = 1; dc[3] = 1;  
-        df[4] = 1;  dc[4] = 0;  
+        df[2] = 0; dc[2] = 1;  
+        break;
+    case este:
+        df[0] = -1;  dc[0] = 1;
+        df[1] = 0;  dc[1] = 1;
+        df[2] = 1; dc[2] = 1;  
         break;
     case sureste:
-        df[0] = -1; dc[0] = 1;
-        df[1] = 0;  dc[1] = 1;
-        df[2] = 1;  dc[2] = 1;
-        df[3] = 1; dc[3] = 0;  
-        df[4] = 1;  dc[4] = -1;  
-        break;
-    case sur:
         df[0] = 0;  dc[0] = 1;
         df[1] = 1;  dc[1] = 1;
-        df[2] = 1;  dc[2] = 0;
-        df[3] = 1; dc[3] = -1;  
-        df[4] = 0;  dc[4] = -1;  
+        df[2] = 1; dc[2] = 0;  
         break;
-    case suroeste:
+    case sur:
         df[0] = 1;  dc[0] = 1;
         df[1] = 1;  dc[1] = 0;
-        df[2] = 1; dc[2] = -1;
-        df[3] = 0; dc[3] = -1;  
-        df[4] = -1;  dc[4] = -1;  
+        df[2] = 1; dc[2] = -1;  
+        break;
+    case suroeste:
+        df[0] = 1;  dc[0] = 0;
+        df[1] = 1; dc[1] = -1;
+        df[2] = 0; dc[2] = -1;  
         break;
     case oeste:
-        df[0] = 1;  dc[0] = 0;
-        df[1] = 1;  dc[1] = -1;
-        df[2] = 0; dc[2] = -1	;
-        df[3] = -1; dc[3] = -1;  
-        df[4] = -1; dc[4] = 0;  
+        df[0] = 1;  dc[0] = -1;
+        df[1] = 0; dc[1] = -1	;
+        df[2] = -1; dc[2] = -1;  
         break;
     case noroeste:
-        df[0] = 1;  dc[0] = -1;
-        df[1] = 0; dc[1] = -1;
-        df[2] = -1; dc[2] = -1;
-        df[3] = -1; dc[3] = 0;  
-        df[4] = -1;  dc[4] = 1;  
+        df[0] = 0; dc[0] = -1;
+        df[1] = -1; dc[1] = -1;
+        df[2] = -1; dc[2] = 0;  
         break;
 }
 
@@ -543,8 +519,7 @@ void DireccionesDesdeRumboR(const Orientacion &rumbo, int df[5], int dc[5]) {
 //         }
 // 	}
 // }
-
-
+2
 
 
 int CasillaMasDesconocidaR(char i, char c, char d,
@@ -558,7 +533,7 @@ int CasillaMasDesconocidaR(char i, char c, char d,
 	//std::cout << "Desconozco-Visitas i: " << vi << " c: " << vc << " d: " << vd << "\n";
 	
 	DireccionesDesdeRumboR(rumbo, df, dc);
-	int menor_visita = min(vi, (vc, vd));
+	int menor_visita = min(vi, min(vc, vd));
 	
 	int i_desconocidos = 0;
 	for (int k = 0; k < 5; k+=2) {
