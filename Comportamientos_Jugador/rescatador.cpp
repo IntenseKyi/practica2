@@ -19,7 +19,7 @@ Action ComportamientoRescatador::think(Sensores sensores)
 		accion = ComportamientoRescatadorNivel_2 (sensores);
 		break;
 	case 3:
-		// accion = ComportamientoRescatadorNivel_3 (sensores);
+		accion = ComportamientoRescatadorNivel_3 (sensores);
 		break;
 	case 4:
 		// accion = ComportamientoRescatadorNivel_4 (sensores);
@@ -801,7 +801,9 @@ Action ComportamientoRescatador::ComportamientoRescatadorNivel_0(Sensores sensor
 		int vc = mapa_visitas[sensores.posF + df[1]][sensores.posC + dc[1]];	// Visitas Centro
 		int vd = mapa_visitas[sensores.posF + df[2]][sensores.posC + dc[2]];	// Visitas Derecha
 
-		
+		i = (i != 'P' && sensores.agentes[1] != 'a') ? i : 'P';
+		c = (c != 'P' && sensores.agentes[2] != 'a') ? c : 'P';
+		d = (d != 'P' && sensores.agentes[3] != 'a') ? d : 'P';
 		
 
 		int pos = VeoCasillaInteresanteR_N0(i, c, d, tiene_zapatillas, vi, vc, vd);
@@ -938,6 +940,9 @@ Action ComportamientoRescatador::ComportamientoRescatadorNivel_2(Sensores sensor
 
 Action ComportamientoRescatador::ComportamientoRescatadorNivel_3(Sensores sensores)
 {
+	Action accion = IDLE;
+
+	return accion;
 }
 
 Action ComportamientoRescatador::ComportamientoRescatadorNivel_4(Sensores sensores)
