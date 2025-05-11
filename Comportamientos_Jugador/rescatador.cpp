@@ -79,7 +79,7 @@ int VeoCasillaInteresanteR_N0 (char i, char c, char d, bool zap, int vi, int vc,
     return 0; // Nada interesante
 }
 
-int InteresCasilla(char cas)
+int InteresCasillaR(char cas)
 {
 	int devuelve;
 	switch(cas)
@@ -116,9 +116,9 @@ int VeoCasillaInteresanteR_N1 (char i, char c, char d, bool zap, int vi, int vc,
     if (d == 'C' || d == 'D' || d == 'S' || d == 'X') transitable[2] = true;
     
     int interes[3] = {
-        InteresCasilla(i),
-        InteresCasilla(c),
-        InteresCasilla(d)
+        InteresCasillaR(i),
+        InteresCasillaR(c),
+        InteresCasillaR(d)
     };
 
     // 4. Emparejar visitas con casillas
@@ -150,18 +150,11 @@ int VeoCasillaInteresanteR_N1 (char i, char c, char d, bool zap, int vi, int vc,
 		}
     }
 	
-	std::cout << "Delante " << i << " " << c << " " << d << endl;
-	std::cout << "Transitables " << transitable[0] << " " << transitable[1] << " " << transitable[2] << endl;
-	std::cout << "Visitas " << vi << " " << vc << " " << vd << endl;
-	//std::cout << "Mejor visitas: " << visitas[eleccion] << endl;
-	std::cout << "Intereses " << interes[0] << " " << interes[1] << " " << interes[2] << endl;
-	//std::cout << "Mejor interes: " << interes[eleccion] << endl;
-	std::cout << "Eleccion " << eleccion[0] << " " << eleccion[1] << " " << eleccion[2] << endl << endl;
-	
-    // Resultado final
-    //if (!transitable[eleccion]) return 0;
-
-    //return eleccion + 1;  // 1: izquierda, 2: centro, 3: derecha
+	//std::cout << "Delante " << i << " " << c << " " << d << endl;
+	//std::cout << "Transitables " << transitable[0] << " " << transitable[1] << " " << transitable[2] << endl;
+	//std::cout << "Visitas " << vi << " " << vc << " " << vd << endl;
+	//std::cout << "Intereses " << interes[0] << " " << interes[1] << " " << interes[2] << endl;
+	//std::cout << "Eleccion " << eleccion[0] << " " << eleccion[1] << " " << eleccion[2] << endl << endl;
     
     if (eleccion[1] && visitas[1] == mejor_visita && interes[1] == mejor_interes) return 2;
 	if (eleccion[0] && visitas[0] == mejor_visita && interes[0] == mejor_interes) return 1;
@@ -511,58 +504,6 @@ void DireccionesDesdeRumboR(const Orientacion &rumbo, int df[3], int dc[3]) {
 
 }
 
-
-// void CasillaMasDesconocidaR(char i, char c, char d,
-//                                                     int fila, int col,
-//                                                     const Orientacion &rumbo,
-//                                                     const vector<vector<unsigned char>> &mapaResultado,
-// 													bool desconocidos[3]) {
-//     int df[5], dc[5];
-//     DireccionesDesdeRumboR(rumbo, df, dc);
-
-//     for (int k = 1; k < 4; k++) {
-//         int nf = fila + df[k];
-//         int nc = col + dc[k];
-//         if (nf >= 0 && nf < mapaResultado.size() &&
-//             nc >= 0 && nc < mapaResultado[0].size()) {
-// 			desconocidos[k-1] = mapaResultado[nf][nc] == '?';
-//         }
-// 	}
-// }
-
-
-
-int CasillaMasDesconocidaR(char i, char c, char d,
-							int fila, int col,
-							const Orientacion &rumbo,
-							const vector<vector<unsigned char>> &mapaResultado,
-							int vi, int vc, int vd) {
-	int desconocidos[3] = {0, 0, 0};
-	int df[3], dc[3];
-
-	//std::cout << "Desconozco-Visitas i: " << vi << " c: " << vc << " d: " << vd << "\n";
-	
-	DireccionesDesdeRumboR(rumbo, df, dc);
-	int menor_visita = -1;
-	
-	int i_desconocidos = 0;
-	for (int k = 0; k < 3; k++) {
-		int nf = fila + df[k];
-		int nc = col + dc[k];
-		if (nf >= 0 && nf < mapaResultado.size() &&
-		nc >= 0 && nc < mapaResultado[0].size()) {
-			if (mapaResultado[nf][nc] == '?') {
-				desconocidos[i_desconocidos] = 1;
-			}
-		}
-		i_desconocidos++;
-	}
-
-	if (desconocidos[1] && vc == menor_visita) return 2; // Frente
-	if (desconocidos[0] && vi == menor_visita) return 1; // Izquierda
-	if (desconocidos[2] && vd == menor_visita) return 3; // Derecha
-	return 0;
-}
 
 
 
