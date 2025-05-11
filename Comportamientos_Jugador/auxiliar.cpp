@@ -15,7 +15,7 @@ Action ComportamientoAuxiliar::think(Sensores sensores)
 		accion = ComportamientoAuxiliarNivel_1 (sensores);
 		break;
 	case 2:
-		// accion = ComportamientoAuxiliarNivel_2 (sensores);
+		accion = ComportamientoAuxiliarNivel_2 (sensores);
 		break;
 	case 3:
 		// accion = ComportamientoAuxiliarNivel_3 (sensores);
@@ -149,11 +149,12 @@ int VeoCasillaInteresanteA_N1 (char i, char c, char d, bool zap, int vi, int vc,
 		}
     }
 	
-	//std::cout << "Delante " << i << " " << c << " " << d << endl;
-	//std::cout << "Transitables " << transitable[0] << " " << transitable[1] << " " << transitable[2] << endl;
-	//std::cout << "Visitas " << vi << " " << vc << " " << vd << endl;
-	//std::cout << "Intereses " << interes[0] << " " << interes[1] << " " << interes[2] << endl;
-	//std::cout << "Eleccion " << eleccion[0] << " " << eleccion[1] << " " << eleccion[2] << endl << endl;
+	std::cout << "Delante " << i << " " << c << " " << d << endl;
+	std::cout << "Transitables " << transitable[0] << " " << transitable[1] << " " << transitable[2] << endl;
+	std::cout << "Visitas " << vi << " " << vc << " " << vd << endl;
+	std::cout << "Intereses " << interes[0] << " " << interes[1] << " " << interes[2] << endl;
+	std::cout << "Eleccion " << eleccion[0] << " " << eleccion[1] << " " << eleccion[2] << endl;
+	std::cout << "M.Visita " << mejor_visita << " M.Interes " << mejor_interes << endl << endl;
     
     if (eleccion[1] && visitas[1] == mejor_visita && interes[1] == mejor_interes) return 2;
 	if (eleccion[0] && visitas[0] == mejor_visita && interes[0] == mejor_interes) return 1;
@@ -603,7 +604,7 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_1(Sensores sensores)
 		girosDcha--;
 	} else if (sensores.agentes[2] == 'r')	//Llego al objetivo
 	{
-		girosDcha = 3;
+		girosDcha = 1;
 		accion = TURN_SR;
 	} else 
 	{
@@ -648,6 +649,9 @@ Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_1(Sensores sensores)
 
 Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_2(Sensores sensores)
 {
+	Action accion = IDLE;
+
+	return accion;
 }
 
 Action ComportamientoAuxiliar::ComportamientoAuxiliarNivel_3(Sensores sensores)
